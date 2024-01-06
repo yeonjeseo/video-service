@@ -4,7 +4,6 @@ import initModel from './associations.js';
 
 const env = config.NODE_ENV;
 const sequelizeConfig = config.SEQUELIZE[env];
-console.log(sequelizeConfig)
 
 const sequelize = new Sequelize(
   sequelizeConfig.database,

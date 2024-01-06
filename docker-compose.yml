@@ -9,7 +9,7 @@ services:
       MYSQL_PASSWORD: mypassword
       MYSQL_ROOT_PASSWORD: rootpassword
     ports:
-      - "3306:3306"
+      - "3001:3306"
 
   nodejs:
     build:
