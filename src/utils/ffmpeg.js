@@ -26,7 +26,7 @@ export const splitVideo = ({identifier, videoPath, offset = 0, extension}) => ne
   console.log(offset);
   ffmpeg(videoPath)
     .setStartTime(offset * UNIT_SEGMENT_DURATION)
-    .setDuration((offset + 1) * UNIT_SEGMENT_DURATION)
+    .setDuration(UNIT_SEGMENT_DURATION)
     .on('end', (stdout, stderr) => {
       resolve();
     })

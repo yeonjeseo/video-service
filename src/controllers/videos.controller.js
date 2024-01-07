@@ -4,7 +4,7 @@ import fs from 'fs';
 import {mergeVideo} from "../services/videos.service.js";
 export const saveVideo = async (req, res, next) => {
   try {
-    const {file,body} = req;
+    const {file} = req;
     await videosServices.splitAndSaveVideoInfos(file);
     return res.status(httpStatus.OK).json("ok");
   }catch (e) {
