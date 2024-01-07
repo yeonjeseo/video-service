@@ -8,19 +8,19 @@ export default (sequelize, DataTypes) =>
         autoIncrement: true,
         comment: '주 식별자',
       },
-      fileName: {
+      identifier: {
         type: DataTypes.STRING(255),
         allowNull: false
       },
       original_name: {
         type: DataTypes.STRING(255),
         allowNull: false,
-        comment: '파일 식별자'
+        comment: '원래 이름'
       },
-      segment_order: {
+      net_segment_count: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        comment: "세그먼트 순서"
+        comment: "세그먼트 갯수"
       },
     },
     {
@@ -28,6 +28,12 @@ export default (sequelize, DataTypes) =>
       tableName: 'tbl_videos',
       timestamps: true,
       charset: 'utf8',
-      collation: 'utf8_general_ci'
+      collation: 'utf8_general_ci',
+      indexes: [
+        {
+          unique: true,
+          fields: ['identifier']
+        }
+      ]
     }
   );

@@ -1,5 +1,6 @@
 import { ffmpeg } from '../utils/index.js';
 import config from '../config/config.js';
+import {videosRepository} from '../repositories/index.js';
 
 const {UNIT_SEGMENT_DURATION} = config;
 
@@ -18,6 +19,12 @@ export const splitAndSaveVideoInfos = async (videoInfo) => {
     offset++;
   }
   await Promise.all(splitPromises);
+
+  await videosRepository.insertVideo({
+    identifier,
+    original_name: videoInfo.originalname,
+    net_segment_count: totalSegmentOffset + 1
+  });
 
   return;
 }
