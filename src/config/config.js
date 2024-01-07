@@ -15,7 +15,8 @@ const config = {
       logging: false,
       timezone: '+09:00',
     }
-  }
+  },
+  UNIT_SEGMENT_DURATION: envVars.UNIT_SEGMENT_DURATION
 }
 
 export default config;

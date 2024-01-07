@@ -1,0 +1,24 @@
+import { ffmpeg } from '../utils/index.js';
+import config from '../config/config.js';
+
+const {UNIT_SEGMENT_DURATION} = config;
+
+export const splitAndSaveVideoInfos = async (videoInfo) => {
+  const videoPath = videoInfo.path;
+  const identifier = videoInfo.filename;
+  const { format: { duration }} = await ffmpeg.getVideoMeta(videoPath);
+
+  const totalSegmentOffset = Math.ceil(duration / UNIT_SEGMENT_DURATION) - 1;
+
+  let offset = 0;
+
+  const splitPromises = [];
+  while(offset <= totalSegmentOffset) {
+    splitPromises.push(ffmpeg.splitVideo({identifier, videoPath, offset}));
+    offset++;
+  }
+  await Promise.all(splitPromises);
+
+  return;
+}
+

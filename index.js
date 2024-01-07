@@ -12,5 +12,5 @@ if (!fs.existsSync(uploadsDirectory)) {
 
 app.listen(NODE_PORT, () => {
   console.log(`Express WAS is listening to port ${NODE_PORT}!! 👂`);
-  db.sequelize.sync({alter: true}).then(() => console.log('MARIA DB connected! 🐬'));
+  // db.sequelize.sync({alter: true}).then(() => console.log('MARIA DB connected! 🐬'));
 });
