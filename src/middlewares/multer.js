@@ -20,4 +20,4 @@ export const singleFile = multer({
       callback(null, req.diretoryName);
     },
   }),
-})
+});

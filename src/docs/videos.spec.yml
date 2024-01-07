@@ -1,0 +1,56 @@
+/videos:
+  post:
+    tags:
+      - videos
+    summary: 영상 업로드 시 분할 저장 후 관련 메타데이터 DB 저장
+    requestBody:
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required:
+              - video
+            properties:
+              video:
+                type: string
+                format: binary
+    responses:
+      200:
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                videoIdentifier:
+                  type: string
+/videos/{videoId}:
+  get:
+    tags:
+      - videos
+    summary: 사용자 지정 범위 영상 다운로드
+    parameters:
+      - in: path
+        name: videoId
+        schema:
+          type: string
+        required: true
+        description: 비디오 id
+      - in: query
+        name: start
+        schema:
+          type: integer
+        description: 영상 시작 시간
+      - in: query
+        name: end
+        schema:
+          type: integer
+        description: 영상 종료 시간
+    responses:
+      200:
+        description: Successful response
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
