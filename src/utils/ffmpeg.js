@@ -21,7 +21,7 @@ export const getVideoMeta = (videoPath) =>  new Promise((resolve, reject) => {
     });
   });
 
-export const splitVideo = ({identifier, videoPath, offset = 0}) => new Promise((resolve, reject) => ffmpeg(videoPath)
+export const splitVideo = ({identifier, videoPath, offset = 0, extension}) => new Promise((resolve, reject) => ffmpeg(videoPath)
   .setStartTime(offset * UNIT_SEGMENT_DURATION)
   .setDuration((offset + 1) * UNIT_SEGMENT_DURATION)
   .on('end', (stdout, stderr) => {
@@ -30,5 +30,5 @@ export const splitVideo = ({identifier, videoPath, offset = 0}) => new Promise((
   .on('error', (err) => {
     reject(err);
   })
-  .save(`./uploads/${identifier}_${offset}.mov`));
+  .save(`./uploads/${identifier}_${offset}.${extension}`));
 

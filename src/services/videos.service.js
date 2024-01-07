@@ -5,7 +5,9 @@ import {videosRepository} from '../repositories/index.js';
 const {UNIT_SEGMENT_DURATION} = config;
 
 export const splitAndSaveVideoInfos = async (videoInfo) => {
+  console.log(videoInfo);
   const videoPath = videoInfo.path;
+  const extension = videoInfo.originalname.split('.').pop();
   const identifier = videoInfo.filename;
   const { format: { duration }} = await ffmpeg.getVideoMeta(videoPath);
 
@@ -15,7 +17,7 @@ export const splitAndSaveVideoInfos = async (videoInfo) => {
 
   const splitPromises = [];
   while(offset <= totalSegmentOffset) {
-    splitPromises.push(ffmpeg.splitVideo({identifier, videoPath, offset}));
+    splitPromises.push(ffmpeg.splitVideo({identifier, videoPath, offset, extension}));
     offset++;
   }
   await Promise.all(splitPromises);
