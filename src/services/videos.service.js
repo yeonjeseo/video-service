@@ -10,7 +10,7 @@ export const splitAndSaveVideoInfos = async (videoInfo) => {
   const identifier = videoInfo.filename;
   const { format: { duration }} = await ffmpeg.getVideoMeta(videoPath);
 
-  const totalSegmentOffset = Math.ceil(duration / UNIT_SEGMENT_DURATION) - 1;
+  const totalSegmentOffset = Math.floor(duration / UNIT_SEGMENT_DURATION);
 
   let offset = 0;
 
@@ -27,7 +27,7 @@ export const splitAndSaveVideoInfos = async (videoInfo) => {
     net_segment_count: totalSegmentOffset + 1
   });
 
-  return;
+  return {videoIdentifier: identifier};
 }
 
 export const determineSegments = async ({ videoIdentifier, start, end}) => {
@@ -59,4 +59,15 @@ export const determineSegments = async ({ videoIdentifier, start, end}) => {
 
 export const mergeVideo = ({ segmentList, temp, dir }) => ffmpeg.mergeSegments({ segmentList, temp, dir });
 
-const determineSegmentBySecond = (second) => Math.ceil(second / UNIT_SEGMENT_DURATION);
+export const trimVideo = async ({tempPath, tempFileName, start, end}) => {
+  const trimStart = start % UNIT_SEGMENT_DURATION;
+  const duration = end - start;
+
+  console.log(trimStart);
+  console.log(duration);
+
+  const trimmedVideoPath = await ffmpeg.trimTempVideo({tempPath, tempFileName, trimStart, duration});
+  return trimmedVideoPath;
+}
+
+const determineSegmentBySecond = (second) => Math.floor(second / UNIT_SEGMENT_DURATION);

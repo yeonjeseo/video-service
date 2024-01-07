@@ -1,6 +1,5 @@
 import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
 import ffprobeInstaller from '@ffprobe-installer/ffprobe';
-import {spawn} from 'child_process';
 
 import config from '../config/config.js'
 import ffmpeg from 'fluent-ffmpeg';
@@ -23,7 +22,6 @@ export const getVideoMeta = (videoPath) =>  new Promise((resolve, reject) => {
   });
 
 export const splitVideo = ({identifier, videoPath, offset = 0, extension}) => new Promise((resolve, reject) => {
-  console.log(offset);
   ffmpeg(videoPath)
     .setStartTime(offset * UNIT_SEGMENT_DURATION)
     .setDuration(UNIT_SEGMENT_DURATION)
@@ -33,6 +31,7 @@ export const splitVideo = ({identifier, videoPath, offset = 0, extension}) => ne
     .on('error', (err) => {
       reject(err);
     })
+    .outputOptions(['-preset fast'])
     .save(`./uploads/${identifier}/${identifier}_${offset}.${extension}`)
   }
 );
@@ -44,7 +43,7 @@ export const mergeSegments = ({ segmentList, temp, dir }) => new Promise((resolv
   concatCommand
     .on('end', () => {
       console.log('Merging finished');
-      resolve(tempPath);
+      resolve({tempPath, tempFileName: temp});
     })
     .on('error', (err) => {
       console.error('Error:', err);
@@ -52,3 +51,20 @@ export const mergeSegments = ({ segmentList, temp, dir }) => new Promise((resolv
     })
     .mergeToFile(tempPath);
 });
+
+export const trimTempVideo = ({tempPath, tempFileName, trimStart, duration}) => new Promise((resolve, reject) => {
+    const trimmedTempPath = `${process.cwd()}/temp/${Date.now()}_${tempFileName}`;
+
+    ffmpeg(tempPath)
+      .setStartTime(trimStart)
+      .setDuration(duration)
+      .on('end', (stdout, stderr) => {
+        resolve(trimmedTempPath);
+      })
+      .on('error', (err) => {
+        reject(err);
+      })
+      .outputOptions(['-preset fast'])
+      .save(trimmedTempPath)
+  }
+);
