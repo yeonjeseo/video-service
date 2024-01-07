@@ -5,9 +5,15 @@ import db from './src/models/index.js';
 const {NODE_PORT} = config;
 
 const uploadsDirectory = './uploads';
+const tempDirectory = './temp'
+
 if (!fs.existsSync(uploadsDirectory)) {
   fs.mkdirSync(uploadsDirectory);
   console.log('uploads directory created.');
+}
+if (!fs.existsSync(tempDirectory)) {
+  fs.mkdirSync(tempDirectory);
+  console.log('temp directory created.');
 }
 
 app.listen(NODE_PORT, () => {

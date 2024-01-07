@@ -12,7 +12,7 @@ const config = {
       username: envVars.MARIADB_USER,
       password: envVars.MARIADB_PASSWORD,
       dialect: 'mariadb',
-      logging: false,
+      logging: true,
       timezone: '+09:00',
     }
   },

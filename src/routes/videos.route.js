@@ -6,5 +6,6 @@ const videosRoute = express.Router();
 
 videosRoute.route('/')
   .post(singleFile.single('video'), videosController.saveVideo);
-
+videosRoute.route('/:videoIdentifier')
+  .get(videosController.getVideo);
 export default videosRoute;
