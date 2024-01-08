@@ -65,9 +65,6 @@ export const trimVideo = async ({tempPath, tempFileName, start, end}) => {
   const trimStart = start % UNIT_SEGMENT_DURATION;
   const duration = end - start;
 
-  console.log(trimStart);
-  console.log(duration);
-
   const trimmedVideoPath = await ffmpeg.trimTempVideo({tempPath, tempFileName, trimStart, duration});
   return trimmedVideoPath;
 }
