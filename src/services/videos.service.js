@@ -2,25 +2,26 @@ import { ffmpeg } from '../utils/index.js';
 import config from '../config/config.js';
 import {videosRepository} from '../repositories/index.js';
 import fs from 'fs';
-const {UNIT_SEGMENT_DURATION} = config;
+
+const UNIT_SEGMENT_DURATION = config.UNIT_SEGMENT_DURATION || 10;
 
 export const splitAndSaveVideoInfos = async (videoInfo) => {
   const videoPath = videoInfo.path;
   const extension = videoInfo.originalname.split('.').pop();
   const identifier = videoInfo.filename;
-  const { format: { duration }} = await ffmpeg.getVideoMeta(videoPath);
 
+  const videoMeta = await ffmpeg.getVideoMeta(videoPath);
+  const {format : { duration }} = videoMeta;
   const totalSegmentOffset = Math.floor(duration / UNIT_SEGMENT_DURATION);
-
   let offset = 0;
 
-  const splitPromises = [];
+  // const splitPromises = [];
   while(offset <= totalSegmentOffset) {
-    splitPromises.push(ffmpeg.splitVideo({identifier, videoPath, offset, extension}));
+    await ffmpeg.splitVideo({identifier, videoPath, offset, extension});
+    // splitPromises.push(ffmpeg.splitVideo({identifier, videoPath, offset, extension}));
     offset++;
   }
-  await Promise.all(splitPromises);
-
+  // const result = await Promise.all(splitPromises);
   await videosRepository.insertVideo({
     identifier,
     original_name: videoInfo.originalname,
@@ -29,6 +30,7 @@ export const splitAndSaveVideoInfos = async (videoInfo) => {
 
   return {videoIdentifier: identifier};
 }
+
 
 export const determineSegments = async ({ videoIdentifier, start, end}) => {
   // DB 조회

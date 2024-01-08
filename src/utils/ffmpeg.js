@@ -6,7 +6,8 @@ import ffmpeg from 'fluent-ffmpeg';
 
 const ffmpegPath = ffmpegInstaller.path;
 const ffprobePath = ffprobeInstaller.path;
-const {UNIT_SEGMENT_DURATION} = config;
+
+const UNIT_SEGMENT_DURATION = config.UNIT_SEGMENT_DURATION || 10;
 
 ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath);
@@ -23,6 +24,7 @@ export const getVideoMeta = (videoPath) =>  new Promise((resolve, reject) => {
 
 export const splitVideo = ({identifier, videoPath, offset = 0, extension}) => new Promise((resolve, reject) => {
   ffmpeg(videoPath)
+    .videoCodec('libx264')
     .setStartTime(offset * UNIT_SEGMENT_DURATION)
     .setDuration(UNIT_SEGMENT_DURATION)
     .on('end', (stdout, stderr) => {
@@ -54,7 +56,6 @@ export const mergeSegments = ({ segmentList, temp, dir }) => new Promise((resolv
 
 export const trimTempVideo = ({tempPath, tempFileName, trimStart, duration}) => new Promise((resolve, reject) => {
     const trimmedTempPath = `${process.cwd()}/temp/${Date.now()}_${tempFileName}`;
-
     ffmpeg(tempPath)
       .setStartTime(trimStart)
       .setDuration(duration)
