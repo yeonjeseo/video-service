@@ -3,14 +3,14 @@ import 'dotenv/config';
 const envVars = process.env;
 
 const config = {
-  NODE_ENV: envVars.NODE_ENV,
-  NODE_PORT: envVars.NODE_PORT,
+  NODE_ENV: 'development',
+  NODE_PORT: 8081,
   SEQUELIZE: {
     development: {
-      host: envVars.MARIADB_HOST,
-      database: envVars.MARIADB_DATABASE,
-      username: envVars.MARIADB_USER,
-      password: envVars.MARIADB_PASSWORD,
+      host: envVars.MARIADB_HOST || 'mariadb',
+      database: envVars.MARIADB_DATABASE || 'mydatabase',
+      username: envVars.MARIADB_USER || 'myuser',
+      password: envVars.MARIADB_PASSWORD || 'mypassword',
       dialect: 'mariadb',
       logging: true,
       timezone: '+09:00',
