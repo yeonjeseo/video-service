@@ -2,7 +2,7 @@ import app from "./src/app.js";
 import config from './src/config/config.js';
 import fs from 'fs';
 import db from './src/models/index.js';
-const {NODE_PORT} = config;
+const NODE_PORT = config.NODE_PORT || 8081;
 
 const uploadsDirectory = './uploads';
 const tempDirectory = './temp'
