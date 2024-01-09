@@ -15,7 +15,7 @@ export const getVideo = async (req, res, next) => {
   try {
     const {
       params: {
-        videoIdentifier
+        videoId
       },
       query: {
         start = 0,
@@ -23,15 +23,19 @@ export const getVideo = async (req, res, next) => {
       }
     } = req;
 
-    // 세그먼트 범위 결정 후 경로들 읽어오기
+    // 세그먼트 범위 결정
     const {
-      segmentList, temp, dir
-    } = await videosServices.determineSegments({ videoIdentifier, start, end});
+      startSegment, endSegment, originalName
+    } = await videosServices.determineSegments({ videoId, start, end});
 
+    const foundSegmentList = await videosServices.findSegmentsBySegmentIndex({videoId, startSegment, endSegment});
+
+    const segmentUidList = foundSegmentList.map(segment => segment.segmentUuid);
     // 비디오 합치기
-    const {tempPath, tempFileName} = await videosServices.mergeVideo({  segmentList, temp, dir });
+
+    const { tempPath, tempFileName} = await videosServices.mergeVideo({ videoId, originalName, segmentUidList });
     // 비디오 다시 트림하기
-    const trimmedTempPath = await videosServices.trimVideo({tempPath, tempFileName, start, end});
+    const trimmedTempPath = await videosServices.trimVideo({ tempPath, tempFileName, start, end});
     // 응답하기
     const fileStream = fs.createReadStream(trimmedTempPath);
     res.attachment(tempPath);

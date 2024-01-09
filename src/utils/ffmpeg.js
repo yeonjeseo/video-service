@@ -89,14 +89,17 @@ export const splitVideoIntoSegment = ({identifier, videoStream}) => new Promise(
     .save(`${process.cwd()}/uploads/${identifier}/output-%03d.mp4`)
 });
 
-export const mergeSegments = ({ segmentList, temp, dir }) => new Promise((resolve, reject) => {
+export const mergeSegments = ({ videoId, originalName, segmentUidList }) => new Promise((resolve, reject) => {
   const concatCommand = ffmpeg();
-  segmentList.forEach(segment => concatCommand.input(`${dir}/${segment}`));
-  const tempPath = `${process.cwd()}/temp/${temp}`
+  console.log(segmentUidList)
+  segmentUidList.forEach(segmentUid => concatCommand.input(`./uploads/${videoId}/${segmentUid}.mp4`));
+  const tempFileName = `${Date.now()}_${originalName}`;
+  const tempPath = `${process.cwd()}/temp/${tempFileName}`
+  console.log(tempPath)
   concatCommand
     .on('end', () => {
       console.log('Merging finished');
-      resolve({tempPath, tempFileName: temp});
+      resolve({tempPath, tempFileName});
     })
     .on('error', (err) => {
       console.error('Error:', err);

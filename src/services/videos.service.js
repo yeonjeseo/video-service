@@ -48,7 +48,6 @@ export const splitAndSaveVideoInfos = async (videoInfo) => {
     await t.commit();
     return {videoId};
   } catch (e) {
-    console.log(e);
     await t.rollback();
     throw e;
   }
@@ -56,34 +55,18 @@ export const splitAndSaveVideoInfos = async (videoInfo) => {
 }
 
 
-export const determineSegments = async ({ videoIdentifier, start, end}) => {
+export const determineSegments = async ({ videoId, start, end}) => {
   // DB 조회
-  const foundVideo = (await videosRepository.findVideoByUuid(videoIdentifier))[0];
+  const foundVideo = (await videosRepository.findVideoById(videoId))[0];
   if(!foundVideo) throw new Error("비디오를 찾을 수 없습니다.");
 
-  const {
-    originalName, netSegmentCount
-  } = foundVideo;
-
-  const temp = `temp_${originalName}`;
-
-  let startSegment = determineSegmentBySecond(start);
+  const startSegment = determineSegmentBySecond(start);
   const endSegment = determineSegmentBySecond(end);
 
-  const searchList = [];
-  while(startSegment <= endSegment) {
-    searchList.push(`${videoIdentifier}_${startSegment}`);
-    startSegment++;
-  }
-
-  const fileDir = `${process.cwd()}/uploads/${videoIdentifier}`
-  const files = fs.readdirSync(fileDir);
-  const segmentList = files.filter(file => searchList.some(fileName => file.includes(fileName)));
-  console.log(segmentList)
-  return { segmentList, temp, dir: fileDir };
+  return { startSegment, endSegment, originalName: foundVideo.originalName};
 }
 
-export const mergeVideo = ({ segmentList, temp, dir }) => ffmpeg.mergeSegments({ segmentList, temp, dir });
+export const mergeVideo = ({ videoId, originalName, segmentUidList }) => ffmpeg.mergeSegments({ videoId, originalName, segmentUidList });
 
 export const trimVideo = async ({tempPath, tempFileName, start, end}) => {
   const trimStart = start % UNIT_SEGMENT_DURATION;
@@ -92,5 +75,7 @@ export const trimVideo = async ({tempPath, tempFileName, start, end}) => {
   const trimmedVideoPath = await ffmpeg.trimTempVideo({tempPath, tempFileName, trimStart, duration});
   return trimmedVideoPath;
 }
+
+export const findSegmentsBySegmentIndex = ({ videoId, startSegment, endSegment}) => videoSegmentsRepository.findSegmentsBySegmentIndexIn({videoId, startSegment, endSegment});
 
 const determineSegmentBySecond = (second) => Math.floor(second / UNIT_SEGMENT_DURATION);
