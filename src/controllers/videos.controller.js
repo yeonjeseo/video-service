@@ -37,8 +37,9 @@ export const getVideo = async (req, res, next) => {
     // 비디오 다시 트림하기
     const trimmedTempPath = await videosServices.trimVideo({ tempPath, tempFileName, start, end});
     // 응답하기
+    console.log(trimmedTempPath);
     const fileStream = fs.createReadStream(trimmedTempPath);
-    res.attachment(tempPath);
+    res.attachment(trimmedTempPath);
     fileStream.pipe(res);
   }catch (e) {
     next(e);
