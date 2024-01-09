@@ -12,7 +12,7 @@ const UNIT_SEGMENT_DURATION = config.UNIT_SEGMENT_DURATION || 10;
 ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath);
 
-export const getVideoMeta = (videoPath) =>  new Promise((resolve, reject) => {
+export const getVideoMetaFromFile = (videoPath) =>  new Promise((resolve, reject) => {
     ffmpeg.ffprobe(videoPath, (err, metadata) => {
       if (err) {
         reject(err);
@@ -22,8 +22,32 @@ export const getVideoMeta = (videoPath) =>  new Promise((resolve, reject) => {
     });
   });
 
-export const splitVideo = ({identifier, videoPath, offset = 0, extension}) => new Promise((resolve, reject) => {
-  ffmpeg(videoPath)
+export const getVideoMetaFromBuffer = (videoBuffer) => new Promise((resolve, reject) => {
+  ffmpeg()
+    .input(videoBuffer)
+    .inputFormat('mp4')
+    .videoCodec('libx264')
+    .on('end', () =>{
+      console.log("Processing Finished!")
+    })
+    .on('error', (err) => {
+      reject(err)
+    })
+    .on('progress', (progress) => {
+      console.log('Processing: ' + progress.percent + '% done');
+    })
+    .ffprobe((err, data) => {
+      if(err) {
+        reject(err);
+        return;
+      }
+      resolve({duration: data.format.duration});
+    })
+})
+
+export const splitVideoFromStream = ({videoId, uuid, videoStream, offset = 0, extension}) => new Promise((resolve, reject) => {
+  ffmpeg()
+    .input(videoStream)
     .videoCodec('libx264')
     .setStartTime(offset * UNIT_SEGMENT_DURATION)
     .setDuration(UNIT_SEGMENT_DURATION)
@@ -34,9 +58,36 @@ export const splitVideo = ({identifier, videoPath, offset = 0, extension}) => ne
       reject(err);
     })
     .outputOptions(['-preset fast'])
-    .save(`./uploads/${identifier}/${identifier}_${offset}.${extension}`)
+    .save(`./uploads/${videoId}/${uuid}.${extension}`)
   }
 );
+
+/**
+ * @deprecated
+ * @param identifier
+ * @param videoStream
+ * @returns {Promise<unknown>}
+ */
+export const splitVideoIntoSegment = ({identifier, videoStream}) => new Promise((resolve, reject) => {
+  ffmpeg()
+    .input(videoStream)
+    .videoCodec('libx264')
+    .outputOptions([
+      '-map 0',
+      '-segment_time 10',
+      '-f segment',
+      '-reset_timestamps 1',
+    ])
+    .on('end', () => {
+      console.log('Processing finished');
+      resolve();
+    })
+    .on('error', (err) => {
+      console.error('Error:', err);
+      reject();
+    })
+    .save(`${process.cwd()}/uploads/${identifier}/output-%03d.mp4`)
+});
 
 export const mergeSegments = ({ segmentList, temp, dir }) => new Promise((resolve, reject) => {
   const concatCommand = ffmpeg();

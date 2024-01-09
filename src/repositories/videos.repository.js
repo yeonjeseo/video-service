@@ -2,12 +2,12 @@ import db from '../models/index.js';
 
 const { Videos } = db;
 
-export const insertVideo = ({ identifier, original_name, net_segment_count}) =>
+export const insertVideo = ({original_name, net_segment_count, duration}, t) =>
   Videos.create({
-    identifier,
     original_name,
-    net_segment_count
-  })
+    net_segment_count,
+    duration
+  }, { transaction: t })
 
 export const findVideoByUuid = (videoIdentifier) => db.sequelize.query(`
   SELECT 

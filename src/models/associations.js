@@ -1,12 +1,10 @@
 import _Videos from './videos.model.js';
-
+import _VideoSegments from './video_segments.model.js'
 const initModel = (sequelize, DataTypes) => {
   const Videos = _Videos(sequelize, DataTypes);
+  const VideoSegments = _VideoSegments(sequelize, DataTypes);
 
-  // Users.hasMany(PurchasedItems, {foreignKey: 'user_id', sourceKey: 'id', onDelete: 'CASCADE', onUpdate: 'CASCADE'});
-  // PurchasedItems.belongsTo(Users, {foreignKey: 'user_id', sourceKey: 'id'});
-
-  return {sequelize, Videos};
+  return {sequelize, Videos, VideoSegments};
 };
 
 export default initModel;

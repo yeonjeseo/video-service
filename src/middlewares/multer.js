@@ -21,3 +21,7 @@ export const singleFile = multer({
     },
   }),
 });
+
+export const memoryUsage =  multer({
+  storage: multer.memoryStorage()
+})

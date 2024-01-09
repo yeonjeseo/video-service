@@ -1,6 +1,6 @@
 export default (sequelize, DataTypes) =>
   sequelize.define(
-    'tbl_videos',
+    'tbl_video_segments',
     {
       id: {
         type: DataTypes.INTEGER,
@@ -8,26 +8,25 @@ export default (sequelize, DataTypes) =>
         autoIncrement: true,
         comment: '주 식별자',
       },
-      original_name: {
-        type: DataTypes.STRING(255),
+      uid: {
+        type: DataTypes.STRING(64),
         allowNull: false,
-        comment: '원래 이름'
+        comment: "uuid"
       },
-      net_segment_count: {
+      video_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        comment: "세그먼트 갯수"
+        comment: '비디오 ID FK'
       },
-      duration: {
-        type: DataTypes.DECIMAL(10, 2),
+      segment_index: {
+        type: DataTypes.INTEGER,
         allowNull: false,
-        default: 0,
-        comment: '영상 길이'
+        comment: "세그먼트 인덱스, 0 based"
       }
     },
     {
       sequelize,
-      tableName: 'tbl_videos',
+      tableName: 'tbl_video_segments',
       timestamps: true,
       charset: 'utf8',
       collation: 'utf8_general_ci',
