@@ -18,6 +18,7 @@ export const findSegmentsBySegmentIndexIn = ({videoId, startSegment, endSegment}
         video_id = ${videoId}
     AND
         segment_index BETWEEN ${startSegment} AND ${endSegment};
+    ORDER BY segment_index ASC
   `, {
     type: QueryTypes.SELECT,
     raw: true

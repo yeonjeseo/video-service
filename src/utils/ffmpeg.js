@@ -99,10 +99,10 @@ export const splitVideo = ({identifier, videoPath, offset = 0, extension}) => ne
 );
 
 // 세그먼트 이어붙이기
-export const mergeSegments = ({ videoId, originalName, segmentUidList }) => new Promise((resolve, reject) => {
+export const mergeSegments = ({ fileUuid, originalName, segmentUidList }) => new Promise((resolve, reject) => {
   const concatCommand = ffmpeg();
 
-  segmentUidList.forEach(segmentUid => concatCommand.input(`${process.cwd()}/uploads/${videoId}/${segmentUid}.mp4`));
+  segmentUidList.forEach(segmentUid => concatCommand.input(`${process.cwd()}/uploads/${fileUuid}/${segmentUid}.mp4`));
   const tempFileName = `${Date.now()}_${originalName}`;
   const tempPath = `${process.cwd()}/temp/${tempFileName}`
   concatCommand

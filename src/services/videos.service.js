@@ -61,10 +61,10 @@ export const determineSegments = async ({ videoId, start, end}) => {
   const startSegment = determineSegmentBySecond(start);
   const endSegment = determineSegmentBySecond(end);
 
-  return { startSegment, endSegment, originalName: foundVideo.originalName};
+  return { startSegment, endSegment, originalName: foundVideo.originalName, fileUuid: foundVideo.fileUuid};
 }
 
-export const mergeVideo = ({ videoId, originalName, segmentUidList }) => ffmpeg.mergeSegments({ videoId, originalName, segmentUidList });
+export const mergeVideo = ({ fileUuid, originalName, segmentUidList }) => ffmpeg.mergeSegments({ fileUuid, originalName, segmentUidList });
 
 export const trimVideo = async ({tempPath, tempFileName, start, end}) => {
   const trimStart = start % UNIT_SEGMENT_DURATION;
