@@ -3,8 +3,8 @@ import {videosServices} from '../services/index.js'
 import fs from 'fs';
 export const saveVideo = async (req, res, next) => {
   try {
-    const {file} = req;
-    const result = await videosServices.splitAndSaveVideoInfos(file);
+    const {file, fileUuid} = req;
+    const result = await videosServices.splitAndSaveVideoInfos({file, fileUuid});
     return res.status(httpStatus.OK).json(result);
   }catch (e) {
     next(e);
@@ -23,9 +23,13 @@ export const getVideo = async (req, res, next) => {
       }
     } = req;
 
+    if(!Number(start) || !Number(end) || Number(start) >= Number(end)) {
+      throw new Error("입력 값이 유효하지 않습니다.");
+    }
+
     // 세그먼트 범위 결정
     const {
-      startSegment, endSegment, originalName
+      startSegment, endSegment, originalName, fileUuid
     } = await videosServices.determineSegments({ videoId, start, end});
 
     const foundSegmentList = await videosServices.findSegmentsBySegmentIndex({videoId, startSegment, endSegment});
@@ -33,7 +37,8 @@ export const getVideo = async (req, res, next) => {
     const segmentUidList = foundSegmentList.map(segment => segment.segmentUuid);
     // 비디오 합치기
 
-    const { tempPath, tempFileName} = await videosServices.mergeVideo({ videoId, originalName, segmentUidList });
+
+    const { tempPath, tempFileName} = await videosServices.mergeVideo({ fileUuid, originalName, segmentUidList });
     // 비디오 다시 트림하기
     const trimmedTempPath = await videosServices.trimVideo({ tempPath, tempFileName, start, end});
     // 응답하기

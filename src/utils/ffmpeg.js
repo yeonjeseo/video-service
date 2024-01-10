@@ -63,37 +63,46 @@ export const splitVideoFromStream = ({videoId, uuid, videoStream, offset = 0, ex
 );
 
 /**
- * @deprecated
  * @param identifier
  * @param videoStream
  * @returns {Promise<unknown>}
  */
-export const splitVideoIntoSegment = ({identifier, videoStream}) => new Promise((resolve, reject) => {
-  ffmpeg()
-    .input(videoStream)
+export const splitVideoFromFile = ({videoUuid, videoPath, segmentUuid, offset}) => new Promise((resolve, reject) => {
+  ffmpeg(videoPath)
     .videoCodec('libx264')
-    .outputOptions([
-      '-map 0',
-      '-segment_time 10',
-      '-f segment',
-      '-reset_timestamps 1',
-    ])
-    .on('end', () => {
-      console.log('Processing finished');
+    .setStartTime(offset * UNIT_SEGMENT_DURATION)
+    .setDuration(UNIT_SEGMENT_DURATION)
+    .on('end', (stdout, stderr) => {
       resolve();
     })
     .on('error', (err) => {
-      console.error('Error:', err);
-      reject();
+      reject(err);
     })
-    .save(`${process.cwd()}/uploads/${identifier}/output-%03d.mp4`)
+    .outputOptions(['-preset fast'])
+    .save(`${process.cwd()}/uploads/${videoUuid}/${segmentUuid}.mp4`)
 });
 
+export const splitVideo = ({identifier, videoPath, offset = 0, extension}) => new Promise((resolve, reject) => {
+    ffmpeg(videoPath)
+      .videoCodec('libx264')
+      .setStartTime(offset * UNIT_SEGMENT_DURATION)
+      .setDuration(UNIT_SEGMENT_DURATION)
+      .on('end', (stdout, stderr) => {
+        resolve();
+      })
+      .on('error', (err) => {
+        reject(err);
+      })
+      .outputOptions(['-preset fast'])
+      .save(`${process.cwd()}/uploads/${identifier}/${identifier}_${offset}.${extension}`)
+  }
+);
+
 // 세그먼트 이어붙이기
-export const mergeSegments = ({ videoId, originalName, segmentUidList }) => new Promise((resolve, reject) => {
+export const mergeSegments = ({ fileUuid, originalName, segmentUidList }) => new Promise((resolve, reject) => {
   const concatCommand = ffmpeg();
 
-  segmentUidList.forEach(segmentUid => concatCommand.input(`${process.cwd()}/uploads/${videoId}/${segmentUid}.mp4`));
+  segmentUidList.forEach(segmentUid => concatCommand.input(`${process.cwd()}/uploads/${fileUuid}/${segmentUid}.mp4`));
   const tempFileName = `${Date.now()}_${originalName}`;
   const tempPath = `${process.cwd()}/temp/${tempFileName}`
   concatCommand
