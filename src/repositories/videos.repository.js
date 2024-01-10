@@ -2,10 +2,11 @@ import db from '../models/index.js';
 
 const { Videos } = db;
 
-export const insertVideo = ({original_name, net_segment_count, duration}, t) =>
+export const insertVideo = ({original_name, net_segment_count, file_uuid, duration}, t) =>
   Videos.create({
     original_name,
     net_segment_count,
+    file_uuid,
     duration
   }, { transaction: t })
 

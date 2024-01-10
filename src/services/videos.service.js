@@ -9,26 +9,25 @@ import db from '../models/index.js';
 
 const UNIT_SEGMENT_DURATION = config.UNIT_SEGMENT_DURATION || 10;
 
-export const splitAndSaveVideoInfos = async (videoInfo) => {
+export const splitAndSaveVideoInfos = async ({file, fileUuid}) => {
   const t = await db.sequelize.transaction();
   try {
-    const videoBuffer = videoInfo.buffer;
-    const videoStream = new stream.PassThrough();
-    videoStream.end(videoInfo.buffer);
-    const videoMeta = await ffmpeg.getVideoMetaFromBuffer(videoStream);
-    const  { duration } = videoMeta;
+    const videoBuffer = file.buffer;
+    const videoPath = file.path;
+    const videoMeta = await ffmpeg.getVideoMetaFromFile(videoPath);
+    // const videoMeta = await ffmpeg.getVideoMetaFromBuffer(videoStream);
+    const  { format: { duration } } = videoMeta;
     const totalSegmentOffset = Math.floor(duration / UNIT_SEGMENT_DURATION);
 
-
     const createdVideo = await videosRepository.insertVideo({
-      original_name: videoInfo.originalname,
+      original_name: file.originalname,
+      file_uuid: fileUuid,
       net_segment_count: totalSegmentOffset + 1,
       duration,
     }, t)
     const videoId = createdVideo.id;
-    createUploadDirectory(videoId);
-
-    const extension = videoInfo.originalname.split('.').pop();
+    // createUploadDirectory(videoId);
+    // const extension = file.originalname.split('.').pop();
 
     let offset = 0;
 
@@ -37,9 +36,10 @@ export const splitAndSaveVideoInfos = async (videoInfo) => {
 
     while(offset <= totalSegmentOffset) {
       const uuid = uuidV4();
-      const tempStream = new stream.PassThrough();
-      tempStream.end(videoBuffer);
-      await ffmpeg.splitVideoFromStream({videoId,uuid, videoStream: tempStream, offset, extension});
+      // const tempStream = new stream.PassThrough();
+      // tempStream.end(videoBuffer);
+      // await ffmpeg.splitVideoIntoSegment({videoId,uuid, videoStream: tempStream, offset, extension});
+      await ffmpeg.splitVideoFromFile({videoPath, videoUuid: fileUuid, segmentUuid: uuid, offset});
       insertSegmentPromises.push(videoSegmentsRepository.insertVideoSegment({videoId, segmentIndex: offset, uid: uuid}, t));
       offset++;
     }
@@ -51,9 +51,7 @@ export const splitAndSaveVideoInfos = async (videoInfo) => {
     await t.rollback();
     throw e;
   }
-
 }
-
 
 export const determineSegments = async ({ videoId, start, end}) => {
   // DB 조회

@@ -18,6 +18,11 @@ export default (sequelize, DataTypes) =>
         allowNull: false,
         comment: "세그먼트 갯수"
       },
+      file_uuid: {
+        type: DataTypes.STRING(),
+        allowNull: false,
+        comment: "파일 uuid"
+      },
       duration: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,

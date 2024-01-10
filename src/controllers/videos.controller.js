@@ -3,8 +3,8 @@ import {videosServices} from '../services/index.js'
 import fs from 'fs';
 export const saveVideo = async (req, res, next) => {
   try {
-    const {file} = req;
-    const result = await videosServices.splitAndSaveVideoInfos(file);
+    const {file, fileUuid} = req;
+    const result = await videosServices.splitAndSaveVideoInfos({file, fileUuid});
     return res.status(httpStatus.OK).json(result);
   }catch (e) {
     next(e);
