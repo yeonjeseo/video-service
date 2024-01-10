@@ -89,12 +89,15 @@ export const splitVideoIntoSegment = ({identifier, videoStream}) => new Promise(
     .save(`${process.cwd()}/uploads/${identifier}/output-%03d.mp4`)
 });
 
+// 세그먼트 이어붙이기
 export const mergeSegments = ({ videoId, originalName, segmentUidList }) => new Promise((resolve, reject) => {
   const concatCommand = ffmpeg();
-  segmentUidList.forEach(segmentUid => concatCommand.input(`./uploads/${videoId}/${segmentUid}.mp4`));
+
+  segmentUidList.forEach(segmentUid => concatCommand.input(`${process.cwd()}/uploads/${videoId}/${segmentUid}.mp4`));
   const tempFileName = `${Date.now()}_${originalName}`;
   const tempPath = `${process.cwd()}/temp/${tempFileName}`
   concatCommand
+    .videoCodec('libx264')
     .on('end', () => {
       console.log('Merging finished');
       resolve({tempPath, tempFileName});
