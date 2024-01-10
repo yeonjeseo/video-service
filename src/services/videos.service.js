@@ -12,7 +12,7 @@ const UNIT_SEGMENT_DURATION = config.UNIT_SEGMENT_DURATION || 10;
 export const splitAndSaveVideoInfos = async ({file, fileUuid}) => {
   const t = await db.sequelize.transaction();
   try {
-    const videoBuffer = file.buffer;
+    // const videoBuffer = file.buffer;
     const videoPath = file.path;
     const videoMeta = await ffmpeg.getVideoMetaFromFile(videoPath);
     // const videoMeta = await ffmpeg.getVideoMetaFromBuffer(videoStream);
