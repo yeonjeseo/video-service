@@ -1,11 +1,11 @@
 import { ffmpeg } from '../utils/index.js';
 import config from '../config/config.js';
-import stream from 'stream';
 import {videoSegmentsRepository, videosRepository,} from '../repositories/index.js';
-import fs from 'fs';
 import { v4 as uuidV4 } from 'uuid'
-import { createUploadDirectory } from '../utils/index.js'
 import db from '../models/index.js';
+// import fs from 'fs';
+// import { createUploadDirectory } from '../utils/index.js'
+// import stream from 'stream';
 
 const UNIT_SEGMENT_DURATION = config.UNIT_SEGMENT_DURATION || 10;
 
