@@ -107,7 +107,7 @@ export const mergeSegments = ({ videoId, originalName, segmentUidList }) => new 
 });
 
 export const trimTempVideo = ({tempPath, tempFileName, trimStart, duration}) => new Promise((resolve, reject) => {
-    const trimmedTempPath = `${process.cwd()}/temp/${Date.now()}_${tempFileName}`;
+    const trimmedTempPath = `${process.cwd()}/temp/temp_${tempFileName}`;
     ffmpeg(tempPath)
       .setStartTime(trimStart)
       .setDuration(duration)
