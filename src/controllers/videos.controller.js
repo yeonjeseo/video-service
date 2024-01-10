@@ -23,6 +23,10 @@ export const getVideo = async (req, res, next) => {
       }
     } = req;
 
+    if(!Number(start) || !Number(end) || Number(start) <= Number(end)) {
+      throw new Error("입력 값이 유효하지 않습니다.");
+    }
+
     // 세그먼트 범위 결정
     const {
       startSegment, endSegment, originalName
