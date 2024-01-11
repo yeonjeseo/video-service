@@ -15,8 +15,16 @@ export const splitAndSaveVideoInfos = async ({file, fileUuid}) => {
     // const videoBuffer = file.buffer;
     const videoPath = file.path;
     const videoMeta = await ffmpeg.getVideoMetaFromFile(videoPath);
+
+    const {
+      streams: [videoStream],
+      format
+    } = videoMeta;
+
+    console.log(videoStream, format);
+
     // const videoMeta = await ffmpeg.getVideoMetaFromBuffer(videoStream);
-    const  { format: { duration } } = videoMeta;
+    const  { duration } = format;
     const totalSegmentOffset = Math.floor(duration / UNIT_SEGMENT_DURATION);
 
     const createdVideo = await videosRepository.insertVideo({
