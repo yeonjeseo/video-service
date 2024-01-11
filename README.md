@@ -15,7 +15,7 @@
 ## 실행 방법
 
 - `git clone https://github.com/yeonjeseo/video-service.git`
-- 
+- clone 한 디렉터리로 이동
 - `docker-compose up`
 
 ## API 명세
