@@ -17,11 +17,13 @@ export const splitAndSaveVideoInfos = async ({file, fileUuid}) => {
     const videoMeta = await ffmpeg.getVideoMetaFromFile(videoPath);
 
     const {
-      streams: [videoStream],
+      streams: [videoStream, audioStream, wtf],
       format
     } = videoMeta;
 
-    console.log(videoStream, format);
+    console.log(videoStream);
+    console.log(audioStream);
+    console.log(wtf);
 
     // const videoMeta = await ffmpeg.getVideoMetaFromBuffer(videoStream);
     const  { duration } = format;
