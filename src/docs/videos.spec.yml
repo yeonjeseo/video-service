@@ -22,8 +22,8 @@
             schema:
               type: object
               properties:
-                videoIdentifier:
-                  type: string
+                videoId:
+                  type: number
 /videos/{videoId}:
   get:
     tags:
