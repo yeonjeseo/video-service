@@ -30,5 +30,11 @@ export default (sequelize, DataTypes) =>
       timestamps: true,
       charset: 'utf8',
       collation: 'utf8_general_ci',
+      indexes: [
+        {
+          name: 'idx_segment_video_id',
+          fields: ['video_id'],
+        },
+      ],
     }
   );
