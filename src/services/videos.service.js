@@ -17,16 +17,37 @@ export const splitAndSaveVideoInfos = async ({file, fileUuid}) => {
     const videoMeta = await ffmpeg.getVideoMetaFromFile(videoPath);
 
     const {
-      streams: [videoStream, audioStream, wtf],
+      streams: [videoStream, audioStream, ...additionalStreams],
       format
     } = videoMeta;
 
-    console.log(videoStream);
-    console.log(audioStream);
-    console.log(wtf);
+    const {
+      codec_name, // 코덱 이름
+      profile,
+      width,    // 비디오 프레임 폭
+      height,   // 비디오 프레임 높이
+      bit_rate, // 비트레이트
+      nb_frames, // 전체 프레임 수
+      r_frame_rate, avg_frame_rate // 프레임 레이트 정보
+    } = videoStream;
+
+    const {
+      filename,   //비디오 파일 경로
+      nb_streams, // 비디오 파일에 있는 총 스트림 수 = streams.length
+      duration,
+      size, // 비디오 파일 크기
+
+    } = format;
+
+    /**
+     * 비디오 해상도는 프레임 크기로 결정된다. -> w * h = 2048 * 854
+     * h264 비디오 스트림의 크기 결정
+     * 비트레이트 : 비디오 스트림이 초당 전송되는 비트 수, 20149278
+     * 프레임 레이트 : 초당 프레임 수, r_frame_rate = 24000/1001; avg_frame_rate: 21150000/881881
+     * 비디오 스트림 파일 사이즈 = 비트레이트 * 비디오 길이 / 8 => 20149278 * 146.98 / 8 (bytes) = 355.2 MB
+     */
 
     // const videoMeta = await ffmpeg.getVideoMetaFromBuffer(videoStream);
-    const  { duration } = format;
     const totalSegmentOffset = Math.floor(duration / UNIT_SEGMENT_DURATION);
 
     const createdVideo = await videosRepository.insertVideo({
